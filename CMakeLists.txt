@@ -1,5 +1,8 @@
 cmake_minimum_required(VERSION 3.16)
 
+set(CMAKE_TRY_COMPILE_TARGET_TYPE "STATIC_LIBRARY")
+
+
 project(STM32-Template C CXX ASM)
 set(TARGET stm32)
 
@@ -39,7 +42,7 @@ set(COMMON_COMPILE_FLAGS "-mcpu=${CPU} -mthumb" )
 # Flags for linker ld
 set(LINKER_FLAGS "--specs=nosys.specs -Wl,--print-memory-usage")
 
-set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${COMMON_COMPILE_FLAGS} ${WARNING_FLAGS} ${DEFINITIONS}")
+set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${COMMON_COMPILE_FLAGS} ${WARNING_FLAGS} ${DEFINITIONS} -Os")
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${COMMON_COMPILE_FLAGS} ${WARNING_FLAGS} ${DEFINITIONS}")
 set(CMAKE_ASM_FLAGS "${CMAKE_ASM_FLAGS} ${COMMON_COMPILE_FLAGS}")
 
@@ -56,7 +59,7 @@ set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} ${LINKER_FLAGS} -T ${LINKE
 #	"${BASE_DIR}/src/main.cpp"
 #)
 
-file(GLOB_RECURSE SOURCES "src/*.*" "drivers/CMSIS/*.*" )
+file(GLOB_RECURSE SOURCES "src/*.*" "libs/*.*" "drivers/CMSIS/*.*" )
 
 # Fill in your header files here. Not actually required for compiling, but
 # some IDEs (e.g. QtCreator) won't list the header files in the project tree
