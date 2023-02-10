@@ -1,48 +1,60 @@
 #include "stm32l476xx.h"
 #include "libs/SysTickTimer.h"
 #include "libs/defines.h"
+#include "libs/IO_Digital.h"
 
 /*
  * TODO: Сделать обёртку вокруг RCC init
  */
 
+void RCC_DeInit(void);
+
+void RCC_Init(void);
+
+
+int main(void) {
+    RCC_DeInit();
+    RCC_Init();
+    SysTickTimer::init(SystemCoreClock);
+
+    SET_BIT(RCC->AHB2ENR, RCC_AHB2ENR_GPIOBEN);
+    while (!READ_BIT(RCC->AHB2ENR, RCC_AHB2ENR_GPIOBEN));
+    IO_Digital pb2(GPIOB, 2, IO_Digital::OUT, IO_Digital::NOPULL);
+
+
+    while (1) {
+        SysTickTimer::delay_ms(500);
+        pb2.toggleState();
+        SysTickTimer::delay_ms(500);
+        pb2.toggleState();
+    }
+
+    return 0;
+}
+
 void RCC_DeInit(void) {
     //enable HSI
     SET_BIT(RCC->CR, RCC_CR_HSION);
     while (!READ_BIT(RCC->CR, RCC_CR_HSIRDY)) {}
-
     //reset calibration
     CLEAR_BIT(RCC->ICSCR, 0xFF << RCC_ICSCR_HSITRIM_Pos);
-
     CLEAR_REG(RCC->CFGR);
-
     while (READ_BIT(RCC->CFGR, RCC_CFGR_SWS) != 0) {}
-
     CLEAR_BIT(RCC->CR, RCC_CR_PLLON);
-
     while (READ_BIT(RCC->CR, RCC_CR_PLLRDY) != 0) {}
-
     CLEAR_BIT(RCC->CR, RCC_CR_HSEON | RCC_CR_CSSON);
-
     while (READ_BIT(RCC->CR, RCC_CR_HSERDY) != 0) {}
-
     CLEAR_BIT(RCC->CR, RCC_CR_HSEBYP);
-
-
     //INTERRUPTs clear
     SET_BIT(RCC->CICR, 0x7FF);
-
     //disable interrupts
     CLEAR_REG(RCC->CIER);
-
     SET_BIT(RCC->CFGR, RCC_CFGR_SW_0);
 
 }
 
 //set 80MHz HCLK and SYSCLK
 void RCC_Init(void) {
-
-
     //Flash config
     //Instruction cache enable
     SET_BIT(FLASH->ACR, FLASH_ACR_ICEN);
@@ -71,56 +83,9 @@ void RCC_Init(void) {
     //Enable PLL and wait unlock
     SET_BIT(RCC->CR, RCC_CR_PLLON);
     while (!(RCC->CR & RCC_CR_PLLRDY));
-
     //Change source to PLLCLK
     SET_BIT(RCC->CFGR, RCC_CFGR_SW_PLL);
     while ((RCC->CFGR & RCC_CFGR_SWS_PLL) != RCC_CFGR_SWS_PLL);
-
     CLEAR_BIT(RCC->CR, RCC_CR_MSION);
-
     SystemCoreClockUpdate();
-
-}
-
-int main(void) {
-    RCC_DeInit();
-    RCC_Init();
-
-    SysTickTimer::init(SystemCoreClock);
-
-
-    SET_BIT(RCC->AHB2ENR, RCC_AHB2ENR_GPIOBEN);
-    while (!READ_BIT(RCC->AHB2ENR, RCC_AHB2ENR_GPIOBEN));
-
-    GPIOB->MODER &= ~(GPIO_MODER_MODE2_0);
-    GPIOB->MODER &= ~(GPIO_MODER_MODE2_1);
-
-    GPIOB->MODER |= GPIO_MODER_MODE2_0;
-    GPIOB->OTYPER &= 0;
-    GPIOB->OSPEEDR |= GPIO_OSPEEDR_OSPEED2_1 & GPIO_OSPEEDR_OSPEED2_0;
-    GPIOB->BSRR |= GPIO_BSRR_BS2;
-
-//    while (1) {
-//
-//        for (volatile uint32_t i = 0; i < 250000; i++) {
-//            asm("NOP");
-//        }
-//        GPIOB->ODR &= ~GPIO_ODR_OD2;
-//        for (volatile uint32_t i = 0; i < 250000; i++) {
-//            asm("NOP");
-//        }
-//        GPIOB->ODR |= GPIO_ODR_OD2;
-//
-//    }
-
-    while (1) {
-        SysTickTimer::delay_ms(1);
-        GPIOB->ODR &= ~GPIO_ODR_OD2;
-        SysTickTimer::delay_ms(1);
-        GPIOB->ODR |= GPIO_ODR_OD2;
-
-
-    }
-
-    return 0;
 }
