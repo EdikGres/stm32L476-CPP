@@ -50,6 +50,8 @@ public:
      */
     IO_Digital(GPIO_TypeDef *port, uint32_t pin, IO io, PULL pull, STATE state);
 
+    virtual ~IO_Digital();
+
     constexpr PULL getPull() const;
 
     constexpr IO isIo() const;
