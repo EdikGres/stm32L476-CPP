@@ -3,8 +3,6 @@
 #include "libs/defines.h"
 #include "libs/IO_Digital.h"
 
-#define SEMIHOSTING
-
 #ifdef SEMIHOSTING
 #include <stdio.h>
 #endif

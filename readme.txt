@@ -1,6 +1,8 @@
 how to flash:
 st-flash --format ihex write stm32.hex
 
+
+(only OpenOCD why not st-util idk)
 enable semihosting:
 1.  add in linker
     "PROVIDE ( __end__ = . );" in ._user_heap_stack
