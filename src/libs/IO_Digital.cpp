@@ -25,7 +25,7 @@ IO_Digital::IO_Digital(GPIO_TypeDef *port, uint32_t pin, IO io, PULL pull, STATE
 IO_Digital::~IO_Digital() {
     port->MODER &= ~(0x03 << (pin * 2));
     port->OTYPER &= ~(0x01 << pin);
-    port->OSPEEDR &= ~0x03 << (pin * 2);
+    port->OSPEEDR &= ~(0x03 << (pin * 2));
     port->PUPDR &= ~(0x03 << (pin * 2));
     port->BSRR |= 0x01 << (pin + 16);
 }

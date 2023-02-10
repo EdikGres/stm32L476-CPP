@@ -3,6 +3,12 @@
 #include "libs/defines.h"
 #include "libs/IO_Digital.h"
 
+#define SEMIHOSTING
+
+#ifdef SEMIHOSTING
+#include <stdio.h>
+#endif
+
 /*
  * TODO: Сделать обёртку вокруг RCC init
  */
@@ -12,10 +18,17 @@ void RCC_DeInit(void);
 void RCC_Init(void);
 
 
+#ifdef SEMIHOSTING
+extern "C" void initialise_monitor_handles(void);
+#endif
+
 int main(void) {
     RCC_DeInit();
     RCC_Init();
     SysTickTimer::init(SystemCoreClock);
+#ifdef SEMIHOSTING
+    initialise_monitor_handles();
+#endif
 
     SET_BIT(RCC->AHB2ENR, RCC_AHB2ENR_GPIOBEN);
     while (!READ_BIT(RCC->AHB2ENR, RCC_AHB2ENR_GPIOBEN));
@@ -27,6 +40,9 @@ int main(void) {
         pb2.toggleState();
         SysTickTimer::delay_ms(500);
         pb2.toggleState();
+#ifdef SEMIHOSTING
+        printf("Hello, World!\n");
+#endif
     }
 
     return 0;

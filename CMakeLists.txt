@@ -24,9 +24,8 @@ set(STARTUP_SCRIPT ${CMAKE_SOURCE_DIR}/startup_stm32l476xx.s)
 # We're not using add_definitions() here, since this would break the calls to the assembler.
 # Some examples:
 set(DEFINITIONS "${DEFINITIONS} -DSTM32L476xx")
-#set(DEFINITIONS "${DEFINITIONS} -D__cplusplus")
-#set(DEFINITIONS "${DEFINITIONS} -DUSE_STDPERIPH_DRIVER")
-#set(DEFINITIONS "${DEFINITIONS} -DUSE_HAL_DRIVER")
+set(DEFINITIONS "${DEFINITIONS} -DSEMIHOSTING")
+
 
 # Prepend the cross-compiler prefix to the used tools.
 set(CMAKE_C_COMPILER "${CROSS_TARGET_TRIPLET}gcc")
@@ -40,7 +39,8 @@ set(WARNING_FLAGS "-Wall -Wextra -Wpedantic")
 set(COMMON_COMPILE_FLAGS "-mcpu=${CPU} -mthumb" )
 
 # Flags for linker ld
-set(LINKER_FLAGS "--specs=nosys.specs -Wl,--print-memory-usage")
+#set(LINKER_FLAGS "--specs=nosys.specs -Wl,--print-memory-usage")
+set(LINKER_FLAGS "-lc -l rdimon --specs=rdimon.specs -Wl,--print-memory-usage")
 
 set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${COMMON_COMPILE_FLAGS} ${WARNING_FLAGS} ${DEFINITIONS} -O0")
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${COMMON_COMPILE_FLAGS} ${WARNING_FLAGS} ${DEFINITIONS} -std=c++14")
